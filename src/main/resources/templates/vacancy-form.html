@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>New vacancy - TalentBoard</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+<div class="container">
+    <h1>New vacancy</h1>
+    <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+
+    <div class="card">
+        <form th:action="@{/vacancies}" th:object="${vacancyRequest}" method="post">
+            <label for="title">Title</label>
+            <input type="text" id="title" th:field="*{title}"/>
+            <div class="field-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+
+            <label for="description">Description</label>
+            <textarea id="description" th:field="*{description}"></textarea>
+            <div class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+
+            <label for="area">Area</label>
+            <input type="text" id="area" th:field="*{area}"/>
+            <div class="field-error" th:if="${#fields.hasErrors('area')}" th:errors="*{area}"></div>
+
+            <label for="workModality">Work modality</label>
+            <select id="workModality" th:field="*{workModality}">
+                <option th:each="m : ${modalities}" th:value="${m}" th:text="${m}"></option>
+            </select>
+            <div class="field-error" th:if="${#fields.hasErrors('workModality')}" th:errors="*{workModality}"></div>
+
+            <label for="salaryMin">Salary min (optional)</label>
+            <input type="number" step="0.01" id="salaryMin" th:field="*{salaryMin}"/>
+
+            <label for="salaryMax">Salary max (optional)</label>
+            <input type="number" step="0.01" id="salaryMax" th:field="*{salaryMax}"/>
+
+            <button class="btn" type="submit">Create</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

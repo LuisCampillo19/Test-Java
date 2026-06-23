@@ -7,7 +7,10 @@ services:
       POSTGRES_USER: ${DB_USERNAME:-talentboard}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-talentboard}
     ports:
-      - "5432:5432"
+      # Host 5433 -> container 5432 to avoid clashing with a PostgreSQL
+      # already running on the host's 5432. The app reaches the DB over the
+      # internal Docker network (db:5432), so this only affects host access.
+      - "5433:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:

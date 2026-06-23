@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: talentboard-db
+    environment:
+      POSTGRES_DB: ${DB_NAME:-talentboard}
+      POSTGRES_USER: ${DB_USERNAME:-talentboard}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-talentboard}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-talentboard}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: talentboard-app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-talentboard}
+      DB_USERNAME: ${DB_USERNAME:-talentboard}
+      DB_PASSWORD: ${DB_PASSWORD:-talentboard}
+      SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+
+volumes:
+  db_data:

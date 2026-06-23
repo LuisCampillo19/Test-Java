@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Application detail - TalentBoard</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+<div class="container">
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+
+    <!-- Application summary -->
+    <div class="card">
+        <h1>Application #<span th:text="${app.id}">0</span></h1>
+        <p class="muted">
+            Candidate: <strong th:text="${app.candidateName}">Candidate</strong> ·
+            Vacancy: <strong th:text="${app.vacancyTitle}">Vacancy</strong>
+        </p>
+        <p>Applied on <span th:text="${app.applicationDate}">date</span></p>
+        <p>Status: <span class="badge" th:text="${app.status}">STATUS</span></p>
+        <p class="muted" th:if="${app.observations}" th:text="${app.observations}">Observations</p>
+    </div>
+
+    <!-- Selection-process tracking: change application status -->
+    <div class="card">
+        <h2>Update process status</h2>
+        <form th:action="@{/applications/{id}/status(id=${app.id})}" method="post">
+            <label>Status
+                <select name="status">
+                    <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"
+                            th:selected="${s == app.status}">STATUS</option>
+                </select>
+            </label>
+            <label>Observations
+                <input type="text" name="observations" placeholder="Optional comment"/>
+            </label>
+            <button class="btn" type="submit">Save status</button>
+        </form>
+    </div>
+
+    <!-- Interview agenda -->
+    <div class="card">
+        <h2>Interview agenda</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Date</th><th>Time</th><th>Type</th><th>Responsible</th>
+                <th>Result</th><th>Observations</th><th>Record result</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="i : ${interviews}">
+                <td th:text="${i.scheduledDate}">date</td>
+                <td th:text="${i.scheduledTime}">time</td>
+                <td th:text="${i.type}">type</td>
+                <td th:text="${i.responsibleName}">responsible</td>
+                <td><span class="badge" th:text="${i.result}">result</span></td>
+                <td class="muted" th:text="${i.observations}">obs</td>
+                <td>
+                    <form th:action="@{/applications/{id}/interviews/{iid}/result(id=${app.id},iid=${i.id})}"
+                          method="post">
+                        <select name="result">
+                            <option th:each="r : ${interviewResults}" th:value="${r}" th:text="${r}"
+                                    th:selected="${r == i.result}">result</option>
+                        </select>
+                        <input type="text" name="observations" placeholder="Notes"/>
+                        <button class="btn btn-secondary" type="submit">Save</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(interviews)}">
+                <td colspan="7" class="muted">No interviews scheduled yet.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Schedule a new interview -->
+    <div class="card">
+        <h2>Schedule interview</h2>
+        <form th:action="@{/applications/{id}/interviews(id=${app.id})}" method="post">
+            <label>Date
+                <input type="date" name="scheduledDate" th:min="${today}" required/>
+            </label>
+            <label>Time
+                <input type="time" name="scheduledTime" required/>
+            </label>
+            <label>Type
+                <select name="type" required>
+                    <option th:each="t : ${interviewTypes}" th:value="${t}" th:text="${t}">type</option>
+                </select>
+            </label>
+            <label>Responsible
+                <select name="responsibleId">
+                    <option value="">— Me (current recruiter) —</option>
+                    <option th:each="u : ${responsibles}" th:value="${u.id}" th:text="${u.fullName}">recruiter</option>
+                </select>
+            </label>
+            <label>Observations
+                <input type="text" name="observations" placeholder="Optional"/>
+            </label>
+            <button class="btn" type="submit">Schedule interview</button>
+        </form>
+    </div>
+
+    <a th:href="@{/vacancies/{id}(id=${app.vacancyId})}">&larr; Back to vacancy</a>
+</div>
+</body>
+</html>

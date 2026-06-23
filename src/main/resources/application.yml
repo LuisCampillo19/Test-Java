@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: talentboard
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:talentboard}
+    username: ${DB_USERNAME:talentboard}
+    password: ${DB_PASSWORD:talentboard}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      # 'update' keeps the schema in sync from the entities during development.
+      # In a production-grade setup you would switch to 'validate' + Flyway migrations.
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: false
+    open-in-view: false
+
+  thymeleaf:
+    cache: false
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    # Expose the message on the friendly error page (templates/error.html).
+    include-message: always
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Vacancies - TalentBoard</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+<div class="container">
+    <h1>Vacancies</h1>
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+
+    <div class="card">
+        <table>
+            <thead>
+            <tr>
+                <th>Title</th><th>Area</th><th>Modality</th><th>Status</th><th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="v : ${vacancies}">
+                <td th:text="${v.title}">Title</td>
+                <td th:text="${v.area}">Area</td>
+                <td th:text="${v.workModality}">Modality</td>
+                <td><span class="badge" th:text="${v.status}">STATUS</span></td>
+                <td><a th:href="@{/vacancies/{id}(id=${v.id})}">View</a></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(vacancies)}">
+                <td colspan="5" class="muted">No vacancies yet.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <a class="btn" sec:authorize="hasAnyRole('RECRUITER','ADMIN')" th:href="@{/vacancies/new}">Create vacancy</a>
+</div>
+</body>
+</html>

@@ -31,6 +31,7 @@ public class InterviewService {
     private final UserRepository userRepository;
     private final InterviewMapper interviewMapper;
     private final SecurityUtil securityUtil;
+    private final ApplicationService applicationService;
 
     /** Schedules an interview for an application. */
     @Transactional
@@ -45,6 +46,14 @@ public class InterviewService {
         }
 
         User responsible = resolveResponsible(request);
+
+        // Rule: an interviewer cannot have two interviews at the same date and
+        // time (interview agendas are individual time slots).
+        if (interviewRepository.existsByResponsibleIdAndScheduledDateAndScheduledTime(
+                responsible.getId(), request.getScheduledDate(), request.getScheduledTime())) {
+            throw new BusinessRuleException(
+                    "That interviewer already has an interview scheduled at this date and time");
+        }
 
         Interview interview = Interview.builder()
                 .application(application)
@@ -79,6 +88,12 @@ public class InterviewService {
 
     @Transactional(readOnly = true)
     public List<InterviewResponse> getByApplication(Long applicationId) {
+        // Rule: a candidate may only see interviews of their own applications.
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Application not found: " + applicationId));
+        applicationService.assertCanRead(application);
+
         return interviewRepository.findByApplicationId(applicationId)
                 .stream().map(interviewMapper::toResponse).toList();
     }

@@ -19,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,12 +60,19 @@ public class ApplicationViewController {
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('RECRUITER','ADMIN')")
     public String detail(@PathVariable Long id, Model model) {
-        model.addAttribute("application", applicationService.getById(id));
+        // NOTE: the model attribute must NOT be named "application": Thymeleaf
+        // reserves "application" as an implicit web-scope object (ServletContext
+        // attributes), which shadows the model variable and makes every
+        // ${application.*} expression resolve to empty.
+        model.addAttribute("app", applicationService.getById(id));
         model.addAttribute("interviews", interviewService.getByApplication(id));
         model.addAttribute("statuses", ApplicationStatus.values());
         model.addAttribute("interviewTypes", InterviewType.values());
         model.addAttribute("interviewResults", InterviewResult.values());
         model.addAttribute("responsibles", userRepository.findByRole(Role.RECRUITER));
+        // Used to block past dates in the interview date picker (client-side guard
+        // that mirrors the server-side "no interviews in the past" rule).
+        model.addAttribute("today", LocalDate.now());
         return "application-detail";
     }
 

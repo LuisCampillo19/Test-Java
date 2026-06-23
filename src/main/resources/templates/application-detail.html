@@ -15,24 +15,24 @@
 
     <!-- Application summary -->
     <div class="card">
-        <h1>Application #<span th:text="${application.id}">0</span></h1>
+        <h1>Application #<span th:text="${app.id}">0</span></h1>
         <p class="muted">
-            Candidate: <strong th:text="${application.candidateName}">Candidate</strong> ·
-            Vacancy: <strong th:text="${application.vacancyTitle}">Vacancy</strong>
+            Candidate: <strong th:text="${app.candidateName}">Candidate</strong> ·
+            Vacancy: <strong th:text="${app.vacancyTitle}">Vacancy</strong>
         </p>
-        <p>Applied on <span th:text="${application.applicationDate}">date</span></p>
-        <p>Status: <span class="badge" th:text="${application.status}">STATUS</span></p>
-        <p class="muted" th:if="${application.observations}" th:text="${application.observations}">Observations</p>
+        <p>Applied on <span th:text="${app.applicationDate}">date</span></p>
+        <p>Status: <span class="badge" th:text="${app.status}">STATUS</span></p>
+        <p class="muted" th:if="${app.observations}" th:text="${app.observations}">Observations</p>
     </div>
 
     <!-- Selection-process tracking: change application status -->
     <div class="card">
         <h2>Update process status</h2>
-        <form th:action="@{/applications/{id}/status(id=${application.id})}" method="post">
+        <form th:action="@{/applications/{id}/status(id=${app.id})}" method="post">
             <label>Status
                 <select name="status">
                     <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"
-                            th:selected="${s == application.status}">STATUS</option>
+                            th:selected="${s == app.status}">STATUS</option>
                 </select>
             </label>
             <label>Observations
@@ -61,7 +61,7 @@
                 <td><span class="badge" th:text="${i.result}">result</span></td>
                 <td class="muted" th:text="${i.observations}">obs</td>
                 <td>
-                    <form th:action="@{/applications/{id}/interviews/{iid}/result(id=${application.id},iid=${i.id})}"
+                    <form th:action="@{/applications/{id}/interviews/{iid}/result(id=${app.id},iid=${i.id})}"
                           method="post">
                         <select name="result">
                             <option th:each="r : ${interviewResults}" th:value="${r}" th:text="${r}"
@@ -82,9 +82,9 @@
     <!-- Schedule a new interview -->
     <div class="card">
         <h2>Schedule interview</h2>
-        <form th:action="@{/applications/{id}/interviews(id=${application.id})}" method="post">
+        <form th:action="@{/applications/{id}/interviews(id=${app.id})}" method="post">
             <label>Date
-                <input type="date" name="scheduledDate" required/>
+                <input type="date" name="scheduledDate" th:min="${today}" required/>
             </label>
             <label>Time
                 <input type="time" name="scheduledTime" required/>
@@ -107,7 +107,7 @@
         </form>
     </div>
 
-    <a th:href="@{/vacancies/{id}(id=${application.vacancyId})}">&larr; Back to vacancy</a>
+    <a th:href="@{/vacancies/{id}(id=${app.vacancyId})}">&larr; Back to vacancy</a>
 </div>
 </body>
 </html>

@@ -66,14 +66,22 @@ public class ApplicationService {
     @Transactional(readOnly = true)
     public ApplicationResponse getById(Long id) {
         Application application = findEntity(id);
-        User current = securityUtil.getCurrentUser();
+        assertCanRead(application);
+        return applicationMapper.toResponse(application);
+    }
 
-        // Rule: a candidate may only access their own applications.
+    /**
+     * Enforces that a candidate may only read information tied to their own
+     * applications. Recruiters and admins are unrestricted. Centralized here so
+     * any feature exposing application-related data (e.g. interviews) reuses the
+     * exact same ownership rule.
+     */
+    public void assertCanRead(Application application) {
+        User current = securityUtil.getCurrentUser();
         if (current.getRole() == Role.CANDIDATE
                 && !application.getCandidate().getId().equals(current.getId())) {
             throw new AccessDeniedAppException("You can only view your own applications");
         }
-        return applicationMapper.toResponse(application);
     }
 
     @Transactional(readOnly = true)

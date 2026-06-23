@@ -34,6 +34,22 @@
         </form>
     </div>
 
+    <!-- Recruiter/Admin: edit vacancy info and change its status -->
+    <div class="card" sec:authorize="hasAnyRole('RECRUITER','ADMIN')">
+        <h2>Manage vacancy</h2>
+        <a class="btn" th:href="@{/vacancies/{id}/edit(id=${vacancy.id})}">Edit vacancy</a>
+
+        <form th:action="@{/vacancies/{id}/status(id=${vacancy.id})}" method="post" style="margin-top:1rem">
+            <label>Status
+                <select name="status">
+                    <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"
+                            th:selected="${s == vacancy.status}">STATUS</option>
+                </select>
+            </label>
+            <button class="btn btn-secondary" type="submit">Change status</button>
+        </form>
+    </div>
+
     <div class="card" sec:authorize="hasAnyRole('RECRUITER','ADMIN')">
         <h2>Applications</h2>
         <table>

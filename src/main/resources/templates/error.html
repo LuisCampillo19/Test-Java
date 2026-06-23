@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Something went wrong - TalentBoard</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body>
+<div class="container-narrow">
+    <div class="card">
+        <h1>Something went wrong</h1>
+        <div class="alert alert-error">
+            <span th:text="${message} ?: 'An unexpected error occurred. Please try again.'">
+                An unexpected error occurred.
+            </span>
+        </div>
+        <p class="muted">
+            Error <span th:text="${status}">500</span>
+            <span th:if="${error}" th:text="'· ' + ${error}"></span>
+        </p>
+        <a class="btn" th:href="@{/dashboard}">Back to dashboard</a>
+    </div>
+</div>
+</body>
+</html>

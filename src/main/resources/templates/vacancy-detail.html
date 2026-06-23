@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${vacancy.title}">Vacancy</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+<div class="container">
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+
+    <div class="card">
+        <h1 th:text="${vacancy.title}">Title</h1>
+        <p><span class="badge" th:text="${vacancy.status}">STATUS</span></p>
+        <p class="muted">
+            <span th:text="${vacancy.area}">Area</span> ·
+            <span th:text="${vacancy.workModality}">Modality</span> ·
+            published <span th:text="${vacancy.publicationDate}">date</span>
+        </p>
+        <p th:text="${vacancy.description}">Description</p>
+        <p class="muted" th:if="${vacancy.salaryMin != null or vacancy.salaryMax != null}">
+            Salary: <span th:text="${vacancy.salaryMin}">min</span> - <span th:text="${vacancy.salaryMax}">max</span>
+        </p>
+        <p class="muted">Responsible: <span th:text="${vacancy.responsibleUserName}">name</span></p>
+
+        <form sec:authorize="hasRole('CANDIDATE')"
+              th:if="${vacancy.status.name() == 'OPEN'}"
+              th:action="@{/vacancies/{id}/apply(id=${vacancy.id})}" method="post">
+            <button class="btn" type="submit">Apply to this vacancy</button>
+        </form>
+    </div>
+
+    <div class="card" sec:authorize="hasAnyRole('RECRUITER','ADMIN')">
+        <h2>Applications</h2>
+        <table>
+            <thead>
+            <tr><th>Candidate</th><th>Date</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="a : ${applications}">
+                <td th:text="${a.candidateName}">Candidate</td>
+                <td th:text="${a.applicationDate}">Date</td>
+                <td><span class="badge" th:text="${a.status}">STATUS</span></td>
+                <td><a th:href="@{/applications/{id}(id=${a.id})}">Manage / interviews</a></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(applications)}">
+                <td colspan="4" class="muted">No applications yet.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <a th:href="@{/vacancies}">&larr; Back to vacancies</a>
+</div>
+</body>
+</html>

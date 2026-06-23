@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Dashboard - TalentBoard</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+<div class="container">
+    <h1>Welcome, <span th:text="${user.fullName}">User</span></h1>
+    <p>Your role: <span class="badge" th:text="${user.role}">ROLE</span></p>
+
+    <div class="card" sec:authorize="hasRole('CANDIDATE')">
+        <h2>Candidate</h2>
+        <p>Browse open positions and track your applications.</p>
+        <a class="btn" th:href="@{/vacancies}">Browse vacancies</a>
+        <a class="btn btn-secondary" th:href="@{/applications/me}">My applications</a>
+    </div>
+
+    <div class="card" sec:authorize="hasAnyRole('RECRUITER','ADMIN')">
+        <h2>Recruiter</h2>
+        <p>Publish vacancies and review candidates.</p>
+        <a class="btn" th:href="@{/vacancies/new}">Create vacancy</a>
+        <a class="btn btn-secondary" th:href="@{/vacancies}">Manage vacancies</a>
+    </div>
+</div>
+</body>
+</html>
